@@ -2,19 +2,32 @@
 
   _stringCompare:
     mov $0, %rdi
-    mov 8(%rsp), %rax
-    mov 16(%rsp), %rbx
-    mov (%rax, %rdi, 1), %al
-    mov (%rbx, %rdi, 1), %bl
-    cmp %al, %bl
-    jne differentChars
+    compareNextChar:
+      mov 8(%rsp), %rax
+      mov 16(%rsp), %rbx
+      mov (%rax, %rdi, 1), %al
+      mov (%rbx, %rdi, 1), %bl
+      add $1, %rdi
+      cmp %al, %bl
+      jne differentChars
 
-    sameChars:
-      mov $0, %rax
-      jmp end_stringCompare
+      sameChars:
+        cmp $0, %al
+        jne compareNextChar
 
-    differentChars:
-      mov $1, %rax
+        mov $0, %rax
+        jmp end_stringCompare
+
+      differentChars:
+        cmp %al, %bl
+        jg secondCharGreater
+
+        firstCharGreater:
+          mov $-1, %rax
+          jmp end_stringCompare
+
+        secondCharGreater:
+          mov $1, %rax
 
     end_stringCompare:
     ret
